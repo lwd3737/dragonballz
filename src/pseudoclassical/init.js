@@ -75,6 +75,13 @@ function handleClick (ev) {
      
    }
 
+  } else if (className === 'wonkiok'){
+
+    if(isExist['SonOgong']){
+      let sonOgong = drangonBallCharacters.find(character => character.name === 'SonOgong');
+      sonOgong.wonkiok();
+    }
+
   }
 }
  
