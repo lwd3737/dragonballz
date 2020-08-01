@@ -1,11 +1,11 @@
 /* eslint-disable */
-if(typeof window === undefined){
-  const {Saiyan, SonOgong, MinBoo} = require('./Characters');
+if (typeof window === undefined) {
+  const { Saiyan, SonOgong, MinBoo } = require('./Characters');
 }
 
-const drangonBallCharacters = [];
+var drangonBallCharacters = [];
 
-function handleClick (ev) {
+function handleClick(ev) {
   /* makeBlinkyDancer is the dancer maker functions available in global scope.
   * A new object of the given type will be created and added
   * to the stage.
@@ -18,73 +18,76 @@ function handleClick (ev) {
   let id = characterForm.id;
   let className = ev.target.className;
   let isExist = Character.prototype.isExist;
-  let character; 
-  
-  if(className === 'addCharacter'){
+  let character;
 
-    if(id === 'SonOgong' && !isExist['SonOgong']){
+  if (className === 'addCharacter') {
+
+    if (id === 'SonOgong' && !isExist['SonOgong']) {
       character = new SonOgong('SonOgong');
 
-    } else if (id === 'SonOban' && !isExist['SonOban']){
+    } else if (id === 'SonOban' && !isExist['SonOban']) {
       character = new Saiyan('SonOban');
-  
-    } else if (id === 'Vegeta' && !isExist['Vegeta']){
+
+    } else if (id === 'Vegeta' && !isExist['Vegeta']) {
       character = new Saiyan('Vegeta');
-  
-    } else if (id === 'MineBoo' && !isExist['MineBoo']){
+
+    } else if (id === 'MineBoo' && !isExist['MineBoo']) {
       character = new MineBoo('MineBoo');
     }
 
-    if(character){
+    if (character) {
       drangonBallCharacters.push(character);
       document.body.append(character.node);
     }
 
-  } else if (className === 'changeSuperSaiyan'){
+  } else if (className === 'changeSuperSaiyan') {
 
-   if(isExist[id]){
-     character = drangonBallCharacters.find(character => character.name === id);
+    if (isExist[id]) {
+      character = drangonBallCharacters.find(character => character.name === id);
 
-     character.changeSuperSaiyan();
-     let btnEl = ev.target;
-     let dataset = btnEl.dataset;
-     
-     if(dataset.stage == 0){
+      let afterChange = character.changeSuperSaiyan();
 
-       btnEl.textContent = 'change supersaiyan 1';
-       dataset.stage = 1;
+      if (!afterChange) return;
 
-     } else if (dataset.stage == 1){
+      let btnEl = ev.target;
+      let dataset = btnEl.dataset;
 
-       if(id === 'SonOgong'){
-         btnEl.textContent = 'change supersaiyan 3'
-         dataset.stage = 3;
+      if (dataset.stage == 0) {
 
-       } else {
+        btnEl.textContent = 'change supersaiyan 1';
+        dataset.stage = 1;
 
-        btnEl.textContent = 'normal'
+      } else if (dataset.stage == 1) {
+
+        if (id === 'SonOgong') {
+          btnEl.textContent = 'change supersaiyan 3'
+          dataset.stage = 3;
+
+        } else {
+
+          btnEl.textContent = 'normal'
+          dataset.stage = 0;
+
+        }
+      } else if (dataset.stage == 3) {
+
+        btnEl.textContent = 'normal';
         dataset.stage = 0;
 
-       }
-     } else if (dataset.stage == 3){
+      }
 
-       btnEl.textContent = 'normal';
-       dataset.stage = 0;
+    }
 
-     }
-     
-   }
+  } else if (className === 'wonkiok-btn') {
 
-  } else if (className === 'wonkiok'){
-
-    if(isExist['SonOgong']){
+    if (isExist['SonOgong']) {
       let sonOgong = drangonBallCharacters.find(character => character.name === 'SonOgong');
       sonOgong.wonkiok();
     }
 
   }
 }
- 
+
 
 window.addEventListener('DOMContentLoaded', () => {
   const topbar = document.querySelector('.topbar');
