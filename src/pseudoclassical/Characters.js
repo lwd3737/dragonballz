@@ -25,10 +25,12 @@ if (typeof window === 'undefined') {
     wonkiokExplosion: './src/pseudoclassical/img/wonkiok-explosion.png',
   };
 
+  var dragged;
 } // you don't have to worry about this code. this is for testing.
 
 // blinkyDancer를 pseudoclassical한 방식으로 리팩토링하세요
 // 참고로, constructor는 대문자로 이름을 시작하는 것이 관례입니다
+
 
 const removePx = px => {
   return Number(px.split('px')[0]);
@@ -43,8 +45,31 @@ const getRange = (least, largest) => {
   return randomVal;
 }
 
+const toggleFloat = (el, haveToFloat = false) => {
+
+  let style = el.style;
+
+  if (haveToFloat) {
+
+    Object.assign(style, {
+      transform: 'translateY(0px)',
+      animation: 'float 6s ease-in-out infinite'
+    });
+
+  } else {
+
+    Object.assign(style, {
+      transform: 'translateX(0px) translateY(0px)',
+      animation: ''
+    });
+
+  }
+
+};
+
 
 function Character(name) {
+
   this.name = name;
   this.node = this.createCharacterEl();
   this.width = 100;
@@ -53,9 +78,13 @@ function Character(name) {
   this.setPosition();
 
   this.node.addEventListener('click', this.energyWave.bind(this));
+  this.node.classList.add('floating');
+  this.addDragEvent();
+
 }
 
 Character.prototype.energyWave = function () {
+
   let startXPosition = Number(this.node.style.left.split('px')[0]) + this.width;
   let startYPosition = Number(this.node.style.top.split('px')[0]) + (this.height / 2);
   let endXPosition;
@@ -110,12 +139,12 @@ Character.prototype.energyWave = function () {
 
           setTimeout(() => {
             explosionImg.remove();
-          }, 1500)
+          }, 1000)
 
         }
 
         energyWaveEl.remove();
-      }, 3600);
+      }, 2000);
 
     };
 
@@ -134,7 +163,9 @@ Character.prototype.energyWave = function () {
       height: this.energyWaveSize,
     });
 
-    setTimeout(fireEnergyWave, 2000);
+    energyWaveEl.classList.add('twinkling');
+
+    setTimeout(fireEnergyWave, 1500);
   };
 
   setTimeout(gatherEnergy, 100);
@@ -291,7 +322,25 @@ Saiyan.prototype.changeSuperSaiyan = function () {
 
   return true;
 
-}
+};
+
+Character.prototype.addDragEvent = function () {
+
+  let el = this.node;
+
+  el.draggable = true;
+
+  const handleDragStart = ev => {
+    dragged = ev.currentTarget;
+  };
+
+  const handleDrag = ev => {
+  };
+
+  el.addEventListener('dragstart', handleDragStart);
+  el.addEventListener('drag', handleDrag);
+
+};
 
 
 //적(마인부우)
@@ -411,7 +460,7 @@ MineBoo.prototype.regenerate = function () {
 function SonOgong(name) {
   Saiyan.call(this, name);
 
-  this.wonkiokSize = 160;
+  this.wonkiokSize = 200;
 
 }
 
@@ -422,14 +471,25 @@ SonOgong.prototype.wonkiok = function () {
 
   if (this.changingState) return;
 
+  const toggleFloating = (el) => {
+    if (el.classList.contains('floating')) {
+      el.classList.remove('floating');
+
+    } else {
+      el.classList.add('floating');
+    }
+  };
+
   this.changingState = true;
 
   let body = document.body;
   let el = this.node;
   let posX = body.clientWidth * 0.1 + 'px';
   let posY = body.clientHeight * 0.5 + 'px';
-  let targetX;
-  let targetY;
+  let distanceX, distanceY;
+  let targetX, targetY;
+
+  toggleFloating(el);
 
   el.classList.forEach((className, idx, classList) => {
     if (className !== 'character') {
@@ -437,9 +497,19 @@ SonOgong.prototype.wonkiok = function () {
     }
   });
 
-  Object.assign(el.style, {
-    transform: `translateX(${posX}) translateY(${posY})`
-  });
+  const locate = () => {
+
+    distanceX = removePx(el.style.left) + removePx(posX) + 'px';
+    distanceY = removePx(el.style.top) + removePx(posY) + 'px';
+
+    Object.assign(el.style, {
+      left: distanceX,
+      top: distanceY,
+    });
+
+  };
+
+  locate();
 
   let explodeWonkiok = () => {
 
@@ -452,14 +522,23 @@ SonOgong.prototype.wonkiok = function () {
     el.src = imgs.SonOgong.normal;
 
     const revertPos = () => {
+
+      let left = body.clientWidth * 0.2 + 'px';
+      let top = body.clientHeight * 0.2 + 'px';
+
       Object.assign(el.style, {
-        transform: '',
+        left: left,
+        top: top
       });
 
       setTimeout(() => {
+
         explosionEl.remove();
+        toggleFloating(el);
+
       }, 3000);
 
+      this.energyWaveSize = '70px';
       this.changingState = false;
     }
 
@@ -513,7 +592,7 @@ SonOgong.prototype.wonkiok = function () {
     el.style.boxShadow = '';
 
     let fireWonkiok = () => {
-      console.log('firewonkiok');
+
       wonkiokEl.removeEventListener('transitionend', fireWonkiok);
 
       targetX = body.clientWidth + 'px';
@@ -532,10 +611,8 @@ SonOgong.prototype.wonkiok = function () {
       wonkiokEl = document.createElement('div');
       wonkiokEl.className = 'wonkiok';
 
-      //let top = el.style.top - this.wonkiokSize - 50 + 'px';
-      //let left = el.style.left - (this.wonkiokSize / 2) + 'px';
-      let top = removePx(el.style.top) + removePx(posY) - this.wonkiokSize - 50 + 'px';
-      let left = removePx(el.style.left) + removePx(posX) - (this.wonkiokSize / 2) + 55 + 'px';
+      let top = removePx(el.style.top) - this.wonkiokSize + 'px';
+      let left = removePx(el.style.left) - (this.wonkiokSize / 2) + 60 + 'px';
 
       document.body.append(wonkiokEl);
 

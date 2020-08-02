@@ -18,6 +18,7 @@ function handleClick(ev) {
   let id = characterForm.id;
   let className = ev.target.className;
   let isExist = Character.prototype.isExist;
+  let btnEl = ev.target;
   let character;
 
   if (className === 'addCharacter') {
@@ -49,7 +50,6 @@ function handleClick(ev) {
 
       if (!afterChange) return;
 
-      let btnEl = ev.target;
       let dataset = btnEl.dataset;
 
       if (dataset.stage == 0) {
@@ -83,14 +83,44 @@ function handleClick(ev) {
     if (isExist['SonOgong']) {
       let sonOgong = drangonBallCharacters.find(character => character.name === 'SonOgong');
       sonOgong.wonkiok();
+      btnEl.parentElement.querySelector('.changeSuperSaiyan').textContent = 'change supersaiyan 1';
     }
 
   }
 }
 
 
+var dragged;
+
 window.addEventListener('DOMContentLoaded', () => {
   const topbar = document.querySelector('.topbar');
 
   topbar.addEventListener('click', handleClick);
+
+  const handleDrop = ev => {
+
+    ev.preventDefault();
+
+    let dataTransfer = ev.dataTransfer;
+    let [left, top] = [ev.clientX + 'px', ev.clientY + 'px'];
+
+
+    console.log('drop:', left, top);
+    Object.assign(dragged.style, {
+      left: left,
+      top: top
+    });
+
+    dragged = null;
+
+  };
+
+  const handleDragOver = ev => {
+    ev.preventDefault();
+
+    console.log(ev.dataTransfer.getData('text/plain'));
+  }
+
+  document.body.ondrop = handleDrop;
+  document.body.ondragover = handleDragOver;
 });
