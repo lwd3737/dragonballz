@@ -11,8 +11,7 @@
     "precommit": "lint-staged",
     "lint": "eslint src",
     "submit": "node .travis/submit.js",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages"
   },
   "lint-staged": {
     "linters": {
