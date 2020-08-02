@@ -63,6 +63,7 @@ button.changeSuperSaiyan{
     transition: box-shadow 5s, background-color 5s, top 2s, left 2s;
     padding: 10px;
     border-radius: 40px;
+    cursor: move;
     
 }
 
